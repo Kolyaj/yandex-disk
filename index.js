@@ -1,7 +1,6 @@
 exports.YandexDisk = YandexDisk;
 
 var DomJS = require('dom-js');
-var domjs = new DomJS.DomJS();
 
 function YandexDisk(login, password) {
     if (arguments.length < 2) {
@@ -44,11 +43,11 @@ YandexDisk.prototype = {
                 return callback(err);
             }
             try {
-                domjs.parse(response, function(err, dom) {
+                new DomJS.DomJS().parse(response, function(err, root) {
                     if (!err) {
                         try {
                             var dir = [];
-                            dom.children.forEach(function(node) {
+                            root.children.forEach(function(node) {
                                 if (node.name == 'd:response') {
                                     dir.push({
                                         href: getNodeValue(node, 'd:href'),
