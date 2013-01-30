@@ -1,0 +1,7 @@
+{
+    "name": "yandex-disk",
+    "version": "0.0.1",
+    "dependencies": {
+        "dom-js": "*"
+    }
+}
