@@ -15,9 +15,31 @@ YandexDisk.prototype = {
     cd: function(path) {
         this._workDir = this._normalizePath(path);
     },
+    
+    writeFile: function(path, content, encoding, callback) {
+        var body = new Buffer(content, encoding);
+        var headers = {
+            'Expect': '100-continue',
+            'Content-Type': 'application/binary',
+            'Content-Length': body.length
+        };
+        this._request('PUT', path, headers, body, null, function(err) {
+            return callback(err);
+        });
+    },
+
+    uploadFile: function(srcFile, targetPath, callback) {
+        var that = this;
+        require('fs').readFile(srcFile, function(err, body) {
+            if (err) {
+                return callback(err);
+            }
+            that.writeFile(targetPath, body, 'binary', callback);
+        });
+    },
 
     exists: function(path, callback) {
-        this._request('PROPFIND', path, {Depth: 1}, null, null, function(err) {
+        this._request('PROPFIND', path, {Depth: 0}, null, null, function(err) {
             if (err) {
                 if (err.message == 'Not found') {
                     return callback(null, false);
@@ -59,7 +81,7 @@ YandexDisk.prototype = {
                                     });
                                 }
                             }, this);
-                            // Первым всегда идёт сама директория, непонятно, зачем она нужна
+                            // Первым всегда идёт сама директория, она нам в этом месте не нужна
                             dir.shift();
                             return callback(null, dir);
                         } catch (e) {
@@ -83,7 +105,7 @@ YandexDisk.prototype = {
             host: 'webdav.yandex.ru',
             port: 443,
             method: method.toUpperCase(),
-            path: this._normalizePath(path),
+            path: encodeURI(this._normalizePath(path)),
             headers: {
                 'Host': 'webdav.yandex.ru',
                 'Accept': '*/*',

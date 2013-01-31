@@ -4,7 +4,7 @@ var disk = new YandexDisk(process.argv[2], process.argv[3]);
 var dirname = Math.random().toString(36).slice(2);
 
 var tests = {
-    'Подключение к диску': function(callback) {
+    'Подключаюсь к диску': function(callback) {
         disk.readdir('/', function(err) {
             if (err) {
                 return callback(err);
@@ -13,38 +13,66 @@ var tests = {
         });
     },
 
-    'Проверка отсутствия директории': function(callback) {
+    'Проверяю отсутствие директории': function(callback) {
         disk.exists(dirname, function(err, exists) {
             callback(err, !exists);
         });
     },
 
-    'Создание директории': function(callback) {
+    'Создаю директорию': function(callback) {
         disk.mkdir(dirname, function(err, status) {
             callback(err, status);
         });
     },
 
-    'Создание существующей директории': function(callback) {
+    'Создаю существующую директорию': function(callback) {
         disk.mkdir(dirname, function(err, status) {
             callback(err, !status);
         });
     },
 
-    'Проверка существования директории': function(callback) {
+    'Проверяю существование директории': function(callback) {
         disk.exists(dirname, function(err, exists) {
             callback(err, exists);
         });
     },
 
-    'Переключение в директорию (cd)': function(callback) {
+    'Переключаюсь в директорию (cd)': function(callback) {
         disk.cd(dirname);
         callback(null, true);
     },
 
-    'Чтение пустой директории': function(callback) {
+    'Читаю пустую директорию': function(callback) {
         disk.readdir('.', function(err, files) {
             callback(err, !files.length);
+        });
+    },
+
+    'Создаю текстовый файл из памяти': function(callback) {
+        disk.writeFile('привет мир.txt', 'Привет, Мир!', 'utf8', function(err) {
+            if (err) {
+                return callback(err);
+            }
+            disk.exists('привет мир.txt', function(err, exists) {
+                callback(err, exists);
+            });
+        });
+    },
+
+    'Создаю бинарный файл с диска': function(callback) {
+        disk.uploadFile(__dirname + '/img.gif', 'img.gif', function(err) {
+            if (err) {
+                return callback(err);
+            }
+            disk.exists('img.gif', function(err, exists) {
+                callback(err, exists);
+            });
+        });
+    },
+    
+    'Читаю директорию с файлами': function(callback) {
+        disk.readdir('.', function(err, files) {
+            callback(err, files.length == 2);
         });
     }
 };
@@ -66,3 +94,4 @@ require('async').series(tasks, function(err) {
         throw err;
     }
 });
+
