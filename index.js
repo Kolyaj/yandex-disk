@@ -38,6 +38,21 @@ YandexDisk.prototype = {
         });
     },
 
+    readFile: function(path, encoding, callback) {
+        this._request('GET', path, null, null, encoding, function(err, content) {
+            return callback(err, content);
+        });
+    },
+
+    downloadFile: function(srcPath, targetFile, callback) {
+        this.readFile(srcPath, 'binary', function(err, content) {
+            if (err) {
+                return callback(err);
+            }
+            require('fs').writeFile(targetFile, content, 'binary', callback);
+        });
+    },
+
     exists: function(path, callback) {
         this._request('PROPFIND', path, {Depth: 0}, null, null, function(err) {
             if (err) {

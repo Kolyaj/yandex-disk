@@ -74,6 +74,12 @@ var tests = {
         disk.readdir('.', function(err, files) {
             callback(err, files.length == 2);
         });
+    },
+
+    'Читаю текстовый файл': function(callback) {
+        disk.readFile('привет мир.txt', 'utf8', function(err, content) {
+            callback(err, content == 'Привет, Мир!');
+        });
     }
 };
 
