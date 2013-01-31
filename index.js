@@ -39,7 +39,11 @@ YandexDisk.prototype = {
     },
 
     readFile: function(path, encoding, callback) {
-        this._request('GET', path, null, null, encoding, function(err, content) {
+        var headers = {
+            'TE': 'chunked',
+            'Accept-Encoding': 'gzip'
+        };
+        this._request('GET', path, headers, null, encoding, function(err, content) {
             return callback(err, content);
         });
     },
@@ -50,6 +54,12 @@ YandexDisk.prototype = {
                 return callback(err);
             }
             require('fs').writeFile(targetFile, content, 'binary', callback);
+        });
+    },
+
+    remove: function(path, callback) {
+        this._request('DELETE', path, null, null, null, function(err) {
+            callback(err);
         });
     },
 

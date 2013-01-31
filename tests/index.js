@@ -80,6 +80,29 @@ var tests = {
         disk.readFile('привет мир.txt', 'utf8', function(err, content) {
             callback(err, content == 'Привет, Мир!');
         });
+    },
+
+    'Удаляю файл': function(callback) {
+        disk.remove('img.gif', function(err) {
+            if (err) {
+                return callback(err);
+            }
+            disk.exists('img.gif', function(err, exists) {
+                return callback(err, !exists);
+            });
+        });
+    },
+
+    'Удаляю директорию с файлами': function(callback) {
+        disk.cd('/');
+        disk.remove(dirname, function(err) {
+            if (err) {
+                return callback(err);
+            }
+            disk.exists(dirname, function(err, exists) {
+                return callback(err, !exists);
+            });
+        });
     }
 };
 
