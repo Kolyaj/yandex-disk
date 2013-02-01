@@ -20,7 +20,7 @@
 
 ## Начало работы
 
-    var YandexDisk = require('..').YandexDisk;
+    var YandexDisk = require('yandex-disk').YandexDisk;
     var disk = new YandexDisk(oauthToken); // доступ по OAuth токену
     // или
     var disk = new YandexDisk(login, password); // доступ по логину и паролю
@@ -43,7 +43,7 @@
     * `size` - если это файл, то размер файла, иначе `0`
     *`lastModified` - дата последней модификации (строка)
 
-Все callback-и принимают первым аргументом объект ошибки, вторым -- результат работы функции, если он есть.
+Всем callback-функциям передаются первым аргументом объект ошибки, вторым -- результат работы функции, если он есть.
 
 ## Полезные ссылки
 
