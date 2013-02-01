@@ -1,6 +1,17 @@
 {
+    "author": {
+        "name": "Kolyaj",
+        "email": "kolyaj@yandex.ru",
+        "url": "https://github.com/Kolyaj"
+    },
     "name": "yandex-disk",
+    "description": "Yandex.Disk API for NodeJS.",
     "version": "0.0.1",
+    "homepage": "https://github.com/Kolyaj/yandex-disk",
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/Kolyaj/yandex-disk.git"
+    },
     "dependencies": {
         "dom-js": "*"
     },
