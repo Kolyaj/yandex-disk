@@ -93,8 +93,32 @@ var tests = {
         });
     },
 
-    'Удаляю директорию с файлами': function(callback) {
+    'Публикую папку': function(callback) {
         disk.cd('/');
+        disk.publish(dirname, function(err, publicUrl) {
+            if (err) {
+                return callback(err);
+            }
+            disk.isPublic(dirname, function(err, publicUrl) {
+                var regExpUrl = /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/;
+                var isUrl = (regExpUrl.test(publicUrl));
+                return callback(err, isUrl);
+            });
+        });
+    },
+
+    'Удаляю публичную ссылку с папки': function(callback) {
+        disk.unPublish(dirname, function(err, publicUrl) {
+            if (err) {
+                return callback(err);
+            }
+            disk.isPublic(dirname, function(err, publicUrl) {
+                return callback(err, publicUrl == null);
+            });
+        });
+    },
+
+    'Удаляю директорию с файлами': function(callback) {
         disk.remove(dirname, function(err) {
             if (err) {
                 return callback(err);

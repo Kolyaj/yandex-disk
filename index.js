@@ -15,7 +15,7 @@ YandexDisk.prototype = {
     cd: function(path) {
         this._workDir = this._normalizePath(path);
     },
-    
+
     writeFile: function(path, content, encoding, callback) {
         var body = new Buffer(content, encoding);
         var headers = {
@@ -120,6 +120,45 @@ YandexDisk.prototype = {
         });
     },
 
+    isPublic: function(path, callback) {
+        var body = '<propfind xmlns="DAV:">' +
+            '<prop>' +
+            '<public_url xmlns="urn:yandex:disk:meta"/>' +
+            '</prop>' +
+            '</propfind>' ;
+        var getPublicUrl = this._getPublicUrl;
+        this._request('PROPFIND', path, {Depth: 0}, body , null, function(err, response) {
+           return getPublicUrl(err, response, callback);
+        });
+    },
+
+    publish: function(path, callback) {
+        var body = '<propertyupdate xmlns="DAV:">' +
+            '<set>' +
+            '<prop>' +
+            '<public_url xmlns="urn:yandex:disk:meta">true</public_url>' +
+            '</prop>' +
+            '</set>' +
+            '</propertyupdate>' ;
+        var getPublicUrl = this._getPublicUrl;
+        this._request('PROPPATCH', path, null, body , null, function(err, response) {
+            return getPublicUrl(err, response, callback);
+        });
+    },
+
+    unPublish: function(path, callback) {
+        var body = '<propertyupdate xmlns="DAV:">' +
+            '<remove>' +
+            '<prop>' +
+            '<public_url xmlns="urn:yandex:disk:meta" />' +
+            '</prop>' +
+            '</remove>' +
+            '</propertyupdate>' ;
+        var getPublicUrl = this._getPublicUrl;
+        this._request('PROPPATCH', path, null, body , null, function(err, response) {
+            return getPublicUrl(err, response, callback);
+        });
+    },
 
     _normalizePath: function(path) {
         return path.indexOf('/') == 0 ? path : require('path').join(this._workDir, path).replace(/\\/g, '/');
@@ -168,6 +207,20 @@ YandexDisk.prototype = {
             callback(err);
         });
         req.end();
+    },
+
+    _getPublicUrl: function(err, response, callback){
+        if (err) {
+            return callback(err);
+        }
+        try {
+            new DomJS.DomJS().parse(response, function(err, root) {
+		    publicUrl = getNodeValue(root, 'public_url');
+		    return callback(null, publicUrl);
+            });
+        } catch (e) {
+            return callback(e);
+        }
     }
 };
 
