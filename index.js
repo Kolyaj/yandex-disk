@@ -215,8 +215,8 @@ YandexDisk.prototype = {
         }
         try {
             new DomJS.DomJS().parse(response, function(err, root) {
-		    publicUrl = getNodeValue(root, 'public_url');
-		    return callback(null, publicUrl);
+    		    var publicUrl = getNodeValue(root, 'public_url');
+	    	    return callback(null, publicUrl);
             });
         } catch (e) {
             return callback(e);
