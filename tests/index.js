@@ -93,6 +93,17 @@ var tests = {
         });
     },
 
+    'Закачиваю папку': function(callback) {
+        disk.uploadDir(__dirname + '/dir1', 'dir1', function(err) {
+            if (err) {
+                return callback(err);
+            }
+            disk.exists('dir1/dir2/img.gif', function(err, exists) {
+                return callback(err, exists);
+            });
+        });
+    },
+
     'Публикую папку': function(callback) {
         disk.cd('/');
         disk.publish(dirname, function(err, publicUrl) {

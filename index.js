@@ -38,6 +38,44 @@ YandexDisk.prototype = {
         });
     },
 
+    uploadDir: function(srcDir, targetDir, callback) {
+        var that = this;
+        this.mkdir(targetDir, function(err) {
+            if (err) {
+                return callback(err);
+            }
+            require('fs').readdir(srcDir, function(err, files) {
+                if (err) {
+                    return callback(err);
+                }
+                (function next(i) {
+                    var srcFullname = require('path').join(srcDir, files[i]);
+                    var targetFullname = targetDir + '/' + files[i];
+                    if (i < files.length) {
+                        require('fs').stat(srcFullname, function(err, stats) {
+                            if (err) {
+                                return callback(err);
+                            }
+                            var uploadFn = stats.isDirectory() ? that.uploadDir : stats.isFile() ? that.uploadFile : null;
+                            if (uploadFn) {
+                                uploadFn.call(that, srcFullname, targetFullname, function(err) {
+                                    if (err) {
+                                        return callback(err);
+                                    }
+                                    next(i + 1);
+                                });
+                            } else {
+                                next(i + 1);
+                            }
+                        })
+                    } else {
+                        callback(null);
+                    }
+                })(0);
+            });
+        });
+    },
+
     readFile: function(path, encoding, callback) {
         var headers = {
             'TE': 'chunked',

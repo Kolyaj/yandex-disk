@@ -30,6 +30,7 @@
 * `disk.cd(dirname)` - делает директорию текущей.
 * `disk.writeFile(path, content, encoding, callback)` - создаёт или перезаписывает файл.
 * `disk.uploadFile(srcFile, targetPath, callback)` - загружает файл из файловой системы на Я.Диск.
+* `disk.uploadDir(srcDir, targetPath, callback)` - загружает директорию из файловой системы на Я.Диск.
 * `disk.readFile(path, encoding, callback)` - читает файл.
 * `disk.downloadFile(srcPath, targetFile, callback)` - скачивает файл из Я.Диска в файловую систему.
 * `disk.remove(path, callback)` - удаляет файл или директорию.
