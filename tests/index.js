@@ -69,6 +69,18 @@ var tests = {
             });
         });
     },
+
+    'Скачиваю бинарный файл на диск': function(callback) {
+        disk.downloadFile('img.gif', __dirname + '/img2.gif', function(err) {
+            if (err) {
+                return callback(err);
+            }
+            var size1 = require('fs').statSync(__dirname + '/img.gif').size;
+            var size2 = require('fs').statSync(__dirname + '/img2.gif').size;
+            require('fs').unlinkSync(__dirname + '/img2.gif');
+            callback(null, size1 == size2);
+        })
+    },
     
     'Читаю директорию с файлами': function(callback) {
         disk.readdir('.', function(err, files) {

@@ -30,11 +30,21 @@ YandexDisk.prototype = {
 
     uploadFile: function(srcFile, targetPath, callback) {
         var that = this;
-        require('fs').readFile(srcFile, function(err, body) {
+        require('fs').stat(srcFile, function(err, stats) {
             if (err) {
                 return callback(err);
             }
-            that.writeFile(targetPath, body, 'binary', callback);
+            if (!stats.isFile()) {
+                return callback(new Error('Not found.'));
+            }
+            var headers = {
+                'Expect': '100-continue',
+                'Content-Type': 'application/binary',
+                'Content-Length': stats.size
+            };
+            that._request('PUT', targetPath, headers, require('fs').createReadStream(srcFile), null, function(err) {
+                return callback(err);
+            });
         });
     },
 
@@ -81,18 +91,15 @@ YandexDisk.prototype = {
             'TE': 'chunked',
             'Accept-Encoding': 'gzip'
         };
-        this._request('GET', path, headers, null, encoding, function(err, content) {
-            return callback(err, content);
-        });
+        this._request('GET', path, headers, null, encoding, callback);
     },
 
     downloadFile: function(srcPath, targetFile, callback) {
-        this.readFile(srcPath, 'binary', function(err, content) {
-            if (err) {
-                return callback(err);
-            }
-            require('fs').writeFile(targetFile, content, 'binary', callback);
-        });
+        var headers = {
+            'TE': 'chunked',
+            'Accept-Encoding': 'gzip'
+        };
+        this._request('GET', srcPath, headers, null, require('fs').createWriteStream(targetFile), callback);
     },
 
     remove: function(path, callback) {
@@ -118,7 +125,7 @@ YandexDisk.prototype = {
             if (err) {
                 return callback(err);
             }
-            return callback(null, response != 'mkdir: folder already exists');
+            return callback(null, response != 'mkdir: resource already exists');
         });
     },
 
@@ -202,7 +209,7 @@ YandexDisk.prototype = {
         return path.indexOf('/') == 0 ? path : require('path').join(this._workDir, path).replace(/\\/g, '/');
     },
 
-    _request: function(method, path, headers, body, responseEncoding, callback) {
+    _request: function(method, path, headers, body, responseType, callback) {
         var options = {
             host: 'webdav.yandex.ru',
             port: 443,
@@ -229,22 +236,30 @@ YandexDisk.prototype = {
             if (code == 409) {
                 return callback(new Error('Conflict'))
             }
-            var response = '';
-            res.setEncoding(responseEncoding || 'binary');
-            res.on('data', function(chunk) {
-                response += chunk;
-            });
+            if (responseType && typeof responseType.write == 'function') {
+                res.pipe(responseType);
+            } else {
+                var response = '';
+                res.setEncoding(responseType || 'binary');
+                res.on('data', function(chunk) {
+                    response += chunk;
+                });
+            }
             res.on('end', function() {
                 callback(null, response);
             });
         });
-        if (body) {
-            req.write(body);
-        }
         req.on('error', function(err) {
             callback(err);
         });
-        req.end();
+        if (body && typeof body.pipe == 'function') {
+            body.pipe(req);
+        } else {
+            if (body) {
+                req.write(body);
+            }
+            req.end();
+        }
     },
 
     _getPublicUrl: function(err, response, callback){
