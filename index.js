@@ -59,9 +59,9 @@ YandexDisk.prototype = {
                     return callback(err);
                 }
                 (function next(i) {
-                    var srcFullname = require('path').join(srcDir, files[i]);
-                    var targetFullname = targetDir + '/' + files[i];
                     if (i < files.length) {
+                        var srcFullname = require('path').join(srcDir, files[i]);
+                        var targetFullname = targetDir + '/' + files[i];
                         require('fs').stat(srcFullname, function(err, stats) {
                             if (err) {
                                 return callback(err);
