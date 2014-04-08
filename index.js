@@ -205,6 +205,26 @@ YandexDisk.prototype = {
         });
     },
 
+    copy: function(path, destination, callback) {
+        var headers = {'Destination': require('url').resolve('/', destination)};
+        this._request('COPY', path, headers, null, null, function(err, response) {
+            if (err) {
+                return callback(err);
+            }
+            return callback(null, true);
+        });
+    },
+
+    move: function(path, destination, callback) {
+        var headers = {'Destination': require('url').resolve('/', destination)};
+        this._request('MOVE', path, headers, null, null, function(err, response) {
+            if (err) {
+                return callback(err);
+            }
+            return callback(null, true);
+        });
+    },
+
     _normalizePath: function(path) {
         return path.indexOf('/') == 0 ? path : require('path').join(this._workDir, path).replace(/\\/g, '/');
     },
@@ -235,6 +255,9 @@ YandexDisk.prototype = {
             }
             if (code == 409) {
                 return callback(new Error('Conflict'))
+            }
+            if (code == 400) {
+                return callback(new Error('Bad Destination'))
             }
             if (responseType && typeof responseType.write == 'function') {
                 res.pipe(responseType);
