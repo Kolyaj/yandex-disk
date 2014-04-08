@@ -94,6 +94,42 @@ var tests = {
         });
     },
 
+    'Копирую текстовый файл': function(callback) {
+        var source = 'привет мир.txt',
+            destination = 'пока мир.txt';
+
+        disk.copy(source, dirname + '/' + destination, function(err) {
+            if(err) {
+                return callback(err);
+            }
+            disk.exists(destination, function(err, exists) {
+                if(!exists) return callback(err);
+                disk.readFile(source, 'utf8', function(err1, content1) {
+                    disk.readFile(destination, 'utf8', function(err2, content2) {
+                        return callback(err2, content1 == content2);
+                    });
+                });
+            });
+        });
+    },
+
+    'Перемещаю текстовый файл': function(callback) {
+        var source = 'привет мир.txt',
+            destination = 'пока мир.txt';
+
+        disk.move(source, dirname + '/' + destination, function(err, status) {
+            if(err) {
+                return callback(err);
+            }
+            disk.exists(source, function(err, exists) {
+                if(exists) return callback(err);
+                disk.readFile(destination, 'utf8', function(err, content) {
+                    return callback(err, content == 'Привет, Мир!');
+                });
+            });
+        });
+    },
+
     'Удаляю файл': function(callback) {
         disk.remove('img.gif', function(err) {
             if (err) {
