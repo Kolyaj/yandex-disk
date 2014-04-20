@@ -4,9 +4,14 @@
         "email": "kolyaj@yandex.ru",
         "url": "https://github.com/Kolyaj"
     },
+    "contributors": [
+        "Kolyaj <kolyaj@yandex.ru> (https://github.com/Kolyaj)",
+        "wwju (https://github.com/wwju)",
+        "tormozz48 (https://github.com/tormozz48)"
+    ],
     "name": "yandex-disk",
     "description": "Yandex.Disk API for NodeJS.",
-    "version": "0.0.5",
+    "version": "0.0.6",
     "homepage": "https://github.com/Kolyaj/yandex-disk",
     "repository": {
         "type": "git",

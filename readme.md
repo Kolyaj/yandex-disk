@@ -20,10 +20,12 @@
 
 ## Начало работы
 
+    ```javascript
     var YandexDisk = require('yandex-disk').YandexDisk;
     var disk = new YandexDisk(oauthToken); // доступ по OAuth токену
     // или
     var disk = new YandexDisk(login, password); // доступ по логину и паролю
+    ```
 
 ## Методы
 
@@ -43,11 +45,11 @@
     * `isDir` - если это директория, то true
     * `size` - если это файл, то размер файла, иначе `0`
     * `lastModified` - дата последней модификации (строка)
+* `disk.copy(path, destination, callback)` - Копирует файл.
+* `disk.move(path, destination, callback)` - Перемещает файл.
 * `disk.isPublic(path, callback)` - проверяет, опубликована ли директория или файл. Ссылку на файл возвращает в callback-функцию, если директория или файл опубликованы, иначе возвращает null.
 * `disk.publish(path, callback)` - публикует папку. В callback возвращает URL с публичной ссылкой.
 * `disk.unPublish(path, callback)` - удаляет публичный доступ к папке. В callback при корректной работе возвращает false.
-* `disk.copy(path, destination, callback)` - Копирует файл.
-* `disk.move(path, destination, callback)` - Перемещает файл.
 
 Всем callback-функциям передаются первым аргументом объект ошибки, вторым -- результат работы функции, если он есть.
 
