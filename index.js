@@ -206,8 +206,8 @@ YandexDisk.prototype = {
     },
 
     copy: function(path, destination, callback) {
-        var headers = {'Destination': require('url').resolve('/', destination)};
-        this._request('COPY', path, headers, null, null, function(err, response) {
+        var headers = {'Destination': encodeURI(this._normalizePath(destination))};
+        this._request('COPY', path, headers, null, null, function(err) {
             if (err) {
                 return callback(err);
             }
@@ -216,8 +216,8 @@ YandexDisk.prototype = {
     },
 
     move: function(path, destination, callback) {
-        var headers = {'Destination': require('url').resolve('/', destination)};
-        this._request('MOVE', path, headers, null, null, function(err, response) {
+        var headers = {'Destination': encodeURI(this._normalizePath(destination))};
+        this._request('MOVE', path, headers, null, null, function(err) {
             if (err) {
                 return callback(err);
             }
