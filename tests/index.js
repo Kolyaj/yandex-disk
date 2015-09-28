@@ -1,6 +1,11 @@
 var YandexDisk = require('..').YandexDisk;
 
-var disk = new YandexDisk(process.argv[2], process.argv[3]);
+var disk;
+if (process.argv[3]) {
+    disk = new YandexDisk(process.argv[2], process.argv[3]);
+} else {
+    disk = new YandexDisk(process.argv[2]);
+}
 var dirname = Math.random().toString(36).slice(2);
 
 var tests = {
