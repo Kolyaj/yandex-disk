@@ -13,6 +13,7 @@ function YandexDisk(login, password) {
 
 YandexDisk.prototype = {
     timeout: 60000,
+
     cd: function(path) {
         this._workDir = this._normalizePath(path);
     },
@@ -285,14 +286,13 @@ YandexDisk.prototype = {
             }
             req.end();
         }
-        
-	req.on('socket', function (socket) {
-		socket.setTimeout(that.timeout);  
-		socket.on('timeout', function() {
-			req.abort();
-		});
-	});
 
+        req.on('socket', function (socket) {
+            socket.setTimeout(that.timeout);
+            socket.on('timeout', function() {
+                req.abort();
+            });
+        });
     },
 
     _getPublicUrl: function(err, response, callback){

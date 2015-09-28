@@ -11,7 +11,7 @@
     ],
     "name": "yandex-disk",
     "description": "Yandex.Disk API for NodeJS.",
-    "version": "0.0.6",
+    "version": "0.0.7",
     "homepage": "https://github.com/Kolyaj/yandex-disk",
     "repository": {
         "type": "git",
