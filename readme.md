@@ -25,6 +25,8 @@
     var disk = new YandexDisk(oauthToken); // доступ по OAuth токену
     // или
     var disk = new YandexDisk(login, password); // доступ по логину и паролю
+    
+    disk.timeout = 60000; //таймаут запроса в миллисекундах (стандартно 60 сек)
     ```
 
 ## Методы
