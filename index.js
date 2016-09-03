@@ -79,7 +79,7 @@ YandexDisk.prototype = {
                             } else {
                                 next(i + 1);
                             }
-                        })
+                        });
                     } else {
                         callback(null);
                     }
@@ -113,7 +113,7 @@ YandexDisk.prototype = {
     exists: function(path, callback) {
         this._request('PROPFIND', path, {Depth: 0}, null, null, function(err) {
             if (err) {
-                if (err.message == 'Not found') {
+                if (err.message === 'Not found') {
                     return callback(null, false);
                 }
                 return callback(err);
@@ -127,7 +127,7 @@ YandexDisk.prototype = {
             if (err) {
                 return callback(err);
             }
-            return callback(null, response != 'mkdir: resource already exists');
+            return callback(null, response !== 'mkdir: resource already exists');
         });
     },
 
@@ -142,7 +142,7 @@ YandexDisk.prototype = {
                         try {
                             var dir = [];
                             root.children.forEach(function(node) {
-                                if (node.name == 'd:response') {
+                                if (node.name === 'd:response') {
                                     dir.push({
                                         href: getNodeValue(node, 'd:href'),
                                         displayName: getNodeValue(node, 'd:displayname'),
@@ -228,7 +228,7 @@ YandexDisk.prototype = {
     },
 
     _normalizePath: function(path) {
-        return path.indexOf('/') == 0 ? path : require('path').join(this._workDir, path).replace(/\\/g, '/');
+        return path.indexOf('/') === 0 ? path : require('path').join(this._workDir, path).replace(/\\/g, '/');
     },
 
     _request: function(method, path, headers, body, responseType, callback) {
@@ -250,19 +250,19 @@ YandexDisk.prototype = {
 
         var req = require('https').request(options, function(res) {
             var code = res.statusCode;
-            if (code == 401) {
+            if (code === 401) {
                 return callback(new Error('Auth error'));
             }
-            if (code == 404) {
+            if (code === 404) {
                 return callback(new Error('Not found'));
             }
-            if (code == 409) {
-                return callback(new Error('Conflict'))
+            if (code === 409) {
+                return callback(new Error('Conflict'));
             }
-            if (code == 400) {
-                return callback(new Error('Bad Destination'))
+            if (code === 400) {
+                return callback(new Error('Bad Destination'));
             }
-            if (responseType && typeof responseType.write == 'function') {
+            if (responseType && typeof responseType.write === 'function') {
                 res.pipe(responseType);
             } else {
                 var response = '';
@@ -278,7 +278,7 @@ YandexDisk.prototype = {
         req.on('error', function(err) {
             callback(err);
         });
-        if (body && typeof body.pipe == 'function') {
+        if (body && typeof body.pipe === 'function') {
             body.pipe(req);
         } else {
             if (body) {
@@ -319,7 +319,7 @@ function getNodes(root, nodeName) {
     var res = [];
     root.children.forEach(function(node) {
         if (node instanceof DomJS.Element) {
-            if (nodeName == '*' || node.name == nodeName) {
+            if (nodeName === '*' || node.name === nodeName) {
                 res.push(node);
             }
             [].push.apply(res, getNodes(node, nodeName));
