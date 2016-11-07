@@ -262,6 +262,9 @@ YandexDisk.prototype = {
             if (code === 400) {
                 return callback(new Error('Bad Destination'));
             }
+            if (code == 507) {
+                return callback(new Error('Insufficient Storage'));
+            }
             if (responseType && typeof responseType.write === 'function') {
                 res.pipe(responseType);
             } else {
