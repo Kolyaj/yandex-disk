@@ -265,6 +265,9 @@ YandexDisk.prototype = {
             if (code == 507) {
                 return callback(new Error('Insufficient Storage'));
             }
+            if (Math.floor(code / 100) != 2) {
+                return callback(new Error(`Unknown error, code: ${code}`));
+            }
             if (responseType && typeof responseType.write === 'function') {
                 res.pipe(responseType);
             } else {
