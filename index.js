@@ -231,7 +231,12 @@ YandexDisk.prototype = {
         return path.indexOf('/') === 0 ? path : require('path').join(this._workDir, path).replace(/\\/g, '/');
     },
 
-    _request: function(method, path, headers, body, responseType, callback) {
+    _request: function(method, path, headers, body, responseType, cb) {
+        let returned = false;
+        function callback() {
+            if (!returned) { cb.apply(this, arguments); }
+            returned = true;
+        }
         var options = {
             host: 'webdav.yandex.ru',
             port: 443,
