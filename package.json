@@ -7,7 +7,8 @@
     "contributors": [
         "Kolyaj <kolyaj@yandex.ru> (https://github.com/Kolyaj)",
         "wwju (https://github.com/wwju)",
-        "tormozz48 (https://github.com/tormozz48)"
+        "tormozz48 (https://github.com/tormozz48)",
+        "outluch (https://github.com/outluch)"
     ],
     "name": "yandex-disk",
     "description": "Yandex.Disk API for NodeJS.",

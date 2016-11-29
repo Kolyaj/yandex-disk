@@ -234,7 +234,16 @@ YandexDisk.prototype = {
         return fpath.indexOf('/') == 0 ? fpath : path.join(this._workDir, fpath).replace(/\\/g, '/');
     },
 
-    _request: function(method, path, headers, body, responseType, callback) {
+    _request: function(method, path, headers, body, responseType, cb) {
+        var returned = false;
+
+        function callback(err, response) {
+            if (!returned) {
+                returned = true;
+                cb(err, response);
+            }
+        }
+
         var options = {
             host: 'webdav.yandex.ru',
             port: 443,
@@ -264,6 +273,12 @@ YandexDisk.prototype = {
             }
             if (code == 400) {
                 return callback(new Error('Bad Destination'));
+            }
+            if (code == 507) {
+                return callback(new Error('Insufficient Storage'));
+            }
+            if (code < 200 && code > 299) {
+                return callback(new Error('Unknown error, code: ' + code));
             }
             if (responseType && typeof responseType.write == 'function') {
                 res.pipe(responseType);
