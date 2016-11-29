@@ -1,6 +1,9 @@
-exports.YandexDisk = YandexDisk;
-
+var fs = require('fs');
+var path = require('path');
+var https = require('https');
 var DomJS = require('dom-js');
+
+exports.YandexDisk = YandexDisk;
 
 function YandexDisk(login, password) {
     if (arguments.length < 2) {
@@ -32,7 +35,7 @@ YandexDisk.prototype = {
 
     uploadFile: function(srcFile, targetPath, callback) {
         var that = this;
-        require('fs').stat(srcFile, function(err, stats) {
+        fs.stat(srcFile, function(err, stats) {
             if (err) {
                 return callback(err);
             }
@@ -44,7 +47,7 @@ YandexDisk.prototype = {
                 'Content-Type': 'application/binary',
                 'Content-Length': stats.size
             };
-            that._request('PUT', targetPath, headers, require('fs').createReadStream(srcFile), null, function(err) {
+            that._request('PUT', targetPath, headers, fs.createReadStream(srcFile), null, function(err) {
                 return callback(err);
             });
         });
@@ -56,15 +59,15 @@ YandexDisk.prototype = {
             if (err) {
                 return callback(err);
             }
-            require('fs').readdir(srcDir, function(err, files) {
+            fs.readdir(srcDir, function(err, files) {
                 if (err) {
                     return callback(err);
                 }
                 (function next(i) {
                     if (i < files.length) {
-                        var srcFullname = require('path').join(srcDir, files[i]);
+                        var srcFullname = path.join(srcDir, files[i]);
                         var targetFullname = targetDir + '/' + files[i];
-                        require('fs').stat(srcFullname, function(err, stats) {
+                        fs.stat(srcFullname, function(err, stats) {
                             if (err) {
                                 return callback(err);
                             }
@@ -79,7 +82,7 @@ YandexDisk.prototype = {
                             } else {
                                 next(i + 1);
                             }
-                        })
+                        });
                     } else {
                         callback(null);
                     }
@@ -101,7 +104,7 @@ YandexDisk.prototype = {
             'TE': 'chunked',
             'Accept-Encoding': 'gzip'
         };
-        this._request('GET', srcPath, headers, null, require('fs').createWriteStream(targetFile), callback);
+        this._request('GET', srcPath, headers, null, fs.createWriteStream(targetFile), callback);
     },
 
     remove: function(path, callback) {
@@ -147,7 +150,7 @@ YandexDisk.prototype = {
                                         href: getNodeValue(node, 'd:href'),
                                         displayName: getNodeValue(node, 'd:displayname'),
                                         creationDate: getNodeValue(node, 'd:creationdate'),
-                                        isDir: !!getNodes(node, 'd:collection').length,
+                                        isDir: Boolean(getNodes(node, 'd:collection').length),
                                         size: getNodeValue(node, 'd:getcontentlength'),
                                         lastModified: getNodeValue(node, 'd:getlastmodified')
                                     });
@@ -172,10 +175,10 @@ YandexDisk.prototype = {
             '<prop>' +
             '<public_url xmlns="urn:yandex:disk:meta"/>' +
             '</prop>' +
-            '</propfind>' ;
+            '</propfind>';
         var getPublicUrl = this._getPublicUrl;
-        this._request('PROPFIND', path, {Depth: 0}, body , null, function(err, response) {
-           return getPublicUrl(err, response, callback);
+        this._request('PROPFIND', path, {Depth: 0}, body, null, function(err, response) {
+            return getPublicUrl(err, response, callback);
         });
     },
 
@@ -186,9 +189,9 @@ YandexDisk.prototype = {
             '<public_url xmlns="urn:yandex:disk:meta">true</public_url>' +
             '</prop>' +
             '</set>' +
-            '</propertyupdate>' ;
+            '</propertyupdate>';
         var getPublicUrl = this._getPublicUrl;
-        this._request('PROPPATCH', path, null, body , null, function(err, response) {
+        this._request('PROPPATCH', path, null, body, null, function(err, response) {
             return getPublicUrl(err, response, callback);
         });
     },
@@ -200,9 +203,9 @@ YandexDisk.prototype = {
             '<public_url xmlns="urn:yandex:disk:meta" />' +
             '</prop>' +
             '</remove>' +
-            '</propertyupdate>' ;
+            '</propertyupdate>';
         var getPublicUrl = this._getPublicUrl;
-        this._request('PROPPATCH', path, null, body , null, function(err, response) {
+        this._request('PROPPATCH', path, null, body, null, function(err, response) {
             return getPublicUrl(err, response, callback);
         });
     },
@@ -227,8 +230,8 @@ YandexDisk.prototype = {
         });
     },
 
-    _normalizePath: function(path) {
-        return path.indexOf('/') == 0 ? path : require('path').join(this._workDir, path).replace(/\\/g, '/');
+    _normalizePath: function(fpath) {
+        return fpath.indexOf('/') == 0 ? fpath : path.join(this._workDir, fpath).replace(/\\/g, '/');
     },
 
     _request: function(method, path, headers, body, responseType, callback) {
@@ -248,7 +251,7 @@ YandexDisk.prototype = {
         });
         var that=this;
 
-        var req = require('https').request(options, function(res) {
+        var req = https.request(options, function(res) {
             var code = res.statusCode;
             if (code == 401) {
                 return callback(new Error('Auth error'));
@@ -257,10 +260,10 @@ YandexDisk.prototype = {
                 return callback(new Error('Not found'));
             }
             if (code == 409) {
-                return callback(new Error('Conflict'))
+                return callback(new Error('Conflict'));
             }
             if (code == 400) {
-                return callback(new Error('Bad Destination'))
+                return callback(new Error('Bad Destination'));
             }
             if (responseType && typeof responseType.write == 'function') {
                 res.pipe(responseType);
@@ -287,7 +290,7 @@ YandexDisk.prototype = {
             req.end();
         }
 
-        req.on('socket', function (socket) {
+        req.on('socket', function(socket) {
             socket.setTimeout(that.timeout);
             socket.on('timeout', function() {
                 req.abort();
@@ -295,14 +298,17 @@ YandexDisk.prototype = {
         });
     },
 
-    _getPublicUrl: function(err, response, callback){
+    _getPublicUrl: function(err, response, callback) {
         if (err) {
             return callback(err);
         }
         try {
             new DomJS.DomJS().parse(response, function(err, root) {
-    		    var publicUrl = getNodeValue(root, 'public_url');
-	    	    return callback(null, publicUrl);
+                if (err) {
+                    return callback(err);
+                }
+                var publicUrl = getNodeValue(root, 'public_url');
+                return callback(null, publicUrl);
             });
         } catch (e) {
             return callback(e);

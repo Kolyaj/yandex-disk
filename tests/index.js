@@ -1,3 +1,5 @@
+var fs = require('fs');
+
 var YandexDisk = require('..').YandexDisk;
 
 var disk;
@@ -80,11 +82,11 @@ var tests = {
             if (err) {
                 return callback(err);
             }
-            var size1 = require('fs').statSync(__dirname + '/img.gif').size;
-            var size2 = require('fs').statSync(__dirname + '/img2.gif').size;
-            require('fs').unlinkSync(__dirname + '/img2.gif');
+            var size1 = fs.statSync(__dirname + '/img.gif').size;
+            var size2 = fs.statSync(__dirname + '/img2.gif').size;
+            fs.unlinkSync(__dirname + '/img2.gif');
             callback(null, size1 == size2);
-        })
+        });
     },
 
     'Читаю директорию с файлами': function(callback) {
@@ -168,7 +170,7 @@ var tests = {
                 return callback(err);
             }
             disk.isPublic(dirname, function(err, publicUrl) {
-                var regExpUrl = /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/;
+                var regExpUrl = /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/;
                 var isUrl = (regExpUrl.test(publicUrl));
                 return callback(err, isUrl);
             });
