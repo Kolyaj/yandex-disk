@@ -21,10 +21,10 @@
 ## Начало работы
 
     ```javascript
-    var YandexDisk = require('yandex-disk').YandexDisk;
-    var disk = new YandexDisk(oauthToken); // доступ по OAuth токену
+    const YandexDisk = require('yandex-disk').YandexDisk;
+    const disk = new YandexDisk(oauthToken); // доступ по OAuth токену
     // или
-    var disk = new YandexDisk(login, password); // доступ по логину и паролю
+    const disk = new YandexDisk(login, password); // доступ по логину и паролю
     ```
     
 ## Свойства
